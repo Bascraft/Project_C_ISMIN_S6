@@ -4,7 +4,7 @@
 #include "SDL/SDL_image.h"  
  
 void pause();
- 
+ //hey
 int main()
 {
     SDL_Init(SDL_INIT_VIDEO); // Initialisation de la SDL
