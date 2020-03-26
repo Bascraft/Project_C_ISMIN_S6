@@ -1,0 +1,4 @@
+image_block/grass_stone.bmp
+2 1
+tile0: background
+tile1: foreground
