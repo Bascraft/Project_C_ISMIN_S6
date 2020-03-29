@@ -1,4 +1,4 @@
-image_block/grass_stone.bmp
+image_block/Textures.bmp
 3 3
 tile0: background
 tile1: foreground
