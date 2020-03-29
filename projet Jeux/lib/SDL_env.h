@@ -22,11 +22,7 @@ typedef struct Map
     int nb_blockX_tileset,nb_blockY_tileset;
     SDL_Surface *image_block;//tileset
     TileProp *props;//tableau des propriete de chaque block
-    blockind **tab_map;
-
-    
-
-    
+    blockind **tab_map;  
 }Map;
 
 //fonction qui initialise la map en mettant tous avec de la grass
