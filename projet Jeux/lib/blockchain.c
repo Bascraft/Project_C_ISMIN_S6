@@ -27,7 +27,16 @@ void calc_new_hash(Block* block)    //Calcule le hash du nouveau bloc
 
 unsigned long hash_index(int index)
 {
-
+    unsigned long hashValue = 0;
+    int i = 0;
+    char* date = itoa(timestamp);   //convertit un entier en char ASCII
+    while ((*date) != '\0')
+    {
+        hashValue += hashValue % HASH_SIZE + ((*string) * (int) pow (BASE, i) )% HASH_SIZE;
+        i++;
+        string++;
+    }
+    return hashValue % HASH_SIZE;
 }
 
 unsigned long hash_author(char* author)
