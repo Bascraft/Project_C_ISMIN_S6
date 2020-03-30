@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #define MAX_PLAYERS 10
+//On met en place les parametres de hachage
 #define HASH_SIZE		37987	/* Prime number */
 #define BASE			128
 
@@ -25,11 +26,11 @@ void calc_new_hash(Block* block)    //Calcule le hash du nouveau bloc
     block->info->hash = hash;
 }
 
-unsigned long hash_index(int index)
+unsigned long hash_index(int index)     //Calcule le hash pour un entier
 {
     unsigned long hashValue = 0;
     int i = 0;
-    char* date = itoa(timestamp);   //convertit un entier en char ASCII
+    char* date = itoa(timestamp);   //Convertit un entier en char ASCII
     while ((*date) != '\0')
     {
         hashValue += hashValue % HASH_SIZE + ((*string) * (int) pow (BASE, i) )% HASH_SIZE;
@@ -39,7 +40,7 @@ unsigned long hash_index(int index)
     return hashValue % HASH_SIZE;
 }
 
-unsigned long hash_author(char* author)
+unsigned long hash_author(char* author)     //Calcule le hash pour une chaine de caracteres
 {
     unsigned long hashValue = 0;
     int i = 0;
@@ -56,7 +57,7 @@ unsigned long hash_timestamp(int timestamp)
 {
     unsigned long hashValue = 0;
     int i = 0;
-    char* date = itoa(timestamp);   //convertit un entier en char ASCII
+    char* date = itoa(timestamp);   //Convertit un entier en char ASCII
     while ((*date) != '\0')
     {
         hashValue += hashValue % HASH_SIZE + ((*string) * (int) pow (BASE, i) )% HASH_SIZE;
