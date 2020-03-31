@@ -94,7 +94,13 @@ int proof_of_work(Block* block, Blockchain* Chains, Arena* Players)      //On te
 //Procedures de recuperation et sauvegarde de blockchains
 void save_write(char* file_name, Block* block)
 {
-	
+	FILE* file;
+	file = fopen(file_name, "a+");
+	if (file!= NULL)
+	{
+		fprintf("%d %s %d %s %d %d",&block->info->index, block->info->author, &block->info->timestamp, block->info->name_house, &block->info->hash, &block->previous_hash);
+	}
+	fclose(file);
 }
 
 Blockchain* get_save(char* file_name)
@@ -102,7 +108,7 @@ Blockchain* get_save(char* file_name)
     Blockchain* new_chain;
     init_blockchain(new_chain);
     FILE file;
-    file = fopen(file_name, "w");
+    file = fopen(file_name, "r");
     Block* block;
     while (fscanf(&file, "%d %s %d %s %d %d",&block->info->index, block->info->author, &block->info->timestamp, block->info->name_house, &block->info->hash, &block->previous_hash) == 6)
     {
@@ -110,6 +116,7 @@ Blockchain* get_save(char* file_name)
         block->previous_hash = new_chain->head->info->hash;
         new_chain->head = block;
     }
+	fclose(file);
     //il faut ajouter la nouvelle chaine a Chains !!!!!!!!!!!!!
     return new_chain;
 }
