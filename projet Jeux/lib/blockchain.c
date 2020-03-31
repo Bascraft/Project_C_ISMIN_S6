@@ -1,5 +1,4 @@
 #include "blockchain.h"
-#include "../lib/SDL_env.c"
 #include <stdio.h>
 #include <stdlib.h>
 

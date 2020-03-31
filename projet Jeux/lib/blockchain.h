@@ -1,4 +1,4 @@
-#include "SDL_env.h"
+#include "../lib/SDL_env.c"
 
 typedef struct
 {
@@ -36,7 +36,7 @@ void calc_new_hash(Block* block);
 unsigned long hash_index(int index);
 unsigned long hash_author(char* author);
 unsigned long hash_timestamp(int timestamp);
-void stock(char* file_name, Block* block, Blockchain* chain, Arena* Players;
+void stock(char* file_name, Block* block, Blockchain* chain, Arena* Players);
 int proof_of_work(Block* block, Blockchain* Chains, Arena* Players);
 
 //Procedures de recuperation et sauvegarde de la blockchain
