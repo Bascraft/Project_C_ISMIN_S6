@@ -68,7 +68,8 @@ int proof_of_work(Block* block, Blockchain* Chains, Arena* Players)      //On te
                 return 0; //On suppose qu'une maison doit avoir une taille minimum de 25m2
             }
     //Si la maison est valide on verifie quelle est bien coherente avec toute les chaines du reseau
-    int correct, wrong;
+    int correct = 0;
+	int wrong = 0;
     for (int player = 0; player<Players->nb_players; player ++)
     {
         
