@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #define MAX_PLAYERS 10
 //On met en place les parametres de hachage
 #define HASH_SIZE		37987	/* Prime number */
@@ -30,7 +31,7 @@ unsigned long hash_index(int index)     //Calcule le hash pour un entier
 {
     unsigned long hashValue = 0;
     int i = 0;
-    char* date = itoa(timestamp);   //Convertit un entier en char ASCII
+    char* date = itoa(index);   //Convertit un entier en char ASCII
     while ((*date) != '\0')
     {
         hashValue += hashValue % HASH_SIZE + ((*string) * (int) pow (BASE, i) )% HASH_SIZE;
@@ -87,11 +88,11 @@ void stock(char* file_name, Block* block, Blockchain* Chains)     //On ajoute un
 }
 
 //!!\\ reste a voir pour que les maisons ne se superposent pas
-bool proof_of_work(Block* block, Blockchain* Chains)      //On teste que le nouveau bloc est bien present chez tout les joueurs
+int proof_of_work(Block* block, Blockchain* Chains)      //On teste que le nouveau bloc est bien present chez tout les joueurs
 {
     if ((block->info->house_info->total_rooms < 3) || (block->info->house_info->nb_kitchen < 1) || (block->info->house_info->nb_bedroom < 1) || (block->info->house_info->nb_WC < 1)
             {
-                return false; //On suppose qu'une maison doit comporter au moins une chambre, une salle de bain et une cuisine donc au moins 3 pieces
+                return 0; //On suppose qu'une maison doit comporter au moins une chambre, une salle de bain et une cuisine donc au moins 3 pieces
             }
     //Si la maison est valide on verifie quelle est bien coherente avec toute les chaines du reseau
     int correct, wrong;
@@ -109,11 +110,11 @@ bool proof_of_work(Block* block, Blockchain* Chains)      //On teste que le nouv
     }
     if (correct >= wrong)
     {
-        return true;
+        return 1;
     }
     else
     {
-        return false;
+        return 0;
     }
 }
 
