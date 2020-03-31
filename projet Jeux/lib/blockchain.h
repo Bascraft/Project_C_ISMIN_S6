@@ -36,7 +36,7 @@ unsigned long hash_index(int index);
 unsigned long hash_author(char* author);
 unsigned long hash_timestamp(int timestamp);
 void stock(char* file_name, Block* block, Blockchain* chain);
-void proof_of_work(Block* block, Blockchain* Chains);
+int proof_of_work(Block* block, Blockchain* Chains);
 
 //Procedures de recuperation et sauvegarde de la blockchain
 void save_write(char* file_name, Block* block);
