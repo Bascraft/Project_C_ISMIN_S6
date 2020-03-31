@@ -98,7 +98,7 @@ void save_write(char* file_name, Block* block)
 	file = fopen(file_name, "a+");
 	if (file!= NULL)
 	{
-		fprintf("%d %s %d %s %d %d",&block->info->index, block->info->author, &block->info->timestamp, block->info->name_house, &block->info->hash, &block->previous_hash);
+		fprintf(file, "%d %s %d %s %d %d",&block->info->index, block->info->author, &block->info->timestamp, block->info->name_house, &block->info->hash, &block->previous_hash);
 	}
 	fclose(file);
 }
