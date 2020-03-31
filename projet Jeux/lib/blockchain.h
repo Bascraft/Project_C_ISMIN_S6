@@ -1,9 +1,10 @@
+#include "SDL_env.h"
+
 typedef struct
 {
 	int index;
 	char* author;
 	int timestamp;
-	char **map_house;
 	Map house_info;
 	int hash;
 } Info;
