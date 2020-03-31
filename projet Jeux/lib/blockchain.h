@@ -3,7 +3,7 @@ typedef struct
 	int index;
 	char* author;
 	int timestamp;
-	int **map_house;
+	char **map_house;
 	Map house_info;
 	int hash;
 } Info;
