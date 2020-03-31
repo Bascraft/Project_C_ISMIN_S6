@@ -23,8 +23,3 @@ void LibereSprite(Sprite* sp)
 
 
 
-
-void affichersprite(SDL_Surface* screen,Sprite *sprite){
-    SDL_BlitSurface(sprite->image_sprite,NULL,screen,&sprite->position_ecran);
-    
-}

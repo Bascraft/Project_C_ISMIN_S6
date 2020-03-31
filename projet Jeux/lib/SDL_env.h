@@ -24,7 +24,6 @@ typedef struct Map
     TileProp *props;//tableau des propriete de chaque block
     blockind **tab_map;  
 }Map;
-
 typedef struct MainMenu {
     SDL_Surface *image_play_default;
     SDL_Surface *image_play_enfonce;
@@ -40,7 +39,6 @@ typedef struct MainMenu {
 void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map);
 void Afficher(SDL_Surface* screen,Map map,Sprite *sprite);
 void ChargerMap_level(char *nom_fichier_prop,char* nom_fichier_level,Map* map);
-void save_map(char* file_name, char* nom_fichier_level,Map* map, char* player, Blockchain* Chains);
 void FreeMap(Map* map);
 void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_Surface* screen,int largeurscreen,int hauteurscreen);
 

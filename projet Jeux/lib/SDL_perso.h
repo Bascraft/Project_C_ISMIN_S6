@@ -24,4 +24,3 @@ typedef struct
 
 Sprite* InitialiserSprite(Sint16 x_ecran,Sint16 y_ecran,Sint16 x_init,Sint16 y_init,char *sprite_image);
 void LibereSprite(Sprite* sp);
-void affichersprite(SDL_Surface* screen,Sprite *sprite);

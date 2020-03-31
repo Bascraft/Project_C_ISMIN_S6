@@ -58,9 +58,11 @@ void stock(char* file_name, Block* block, Blockchain* Chains, Arena* Players)   
 //!!\\ reste a voir pour que les maisons ne se superposent pas
 int proof_of_work(Block* block, Blockchain* Chains, Arena* Players)      //On teste que le nouveau bloc est bien present chez tout les joueurs
 {
-	FILE f_house = fopen(block->info->name_house, "r");
+	FILE *f_house; 
+    f_house = fopen(block->info->name_house, "r");
 	int x_size, y_size;
 	fscanf(&f_house, "%d %d", &x_size, &y_size);
+    int house_size;
 	house_size = x_size * y_size;
     if (house_size < 25)
             {
@@ -111,4 +113,30 @@ Blockchain* get_save(char* file_name)
     }
     //il faut ajouter la nouvelle chaine a Chains !!!!!!!!!!!!!
     return new_chain;
+}
+
+void save_map(char* file_name, char* nom_fichier_level,Map* map, char* player, Blockchain* Chains, Arena* Players){
+	FILE* fichier_level;
+    fichier_level = fopen(nom_fichier_level,"w");
+	int x,y;
+	x = map->nb_block_largeur_monde;
+	y = map->nb_block_hauteur_monde;
+	fprintf(fichier_level,"%d %d\n",x,y);
+	for (int i =0;i<y;i++){
+		for (int j = 0; j < x; j++)
+		{
+			fprintf(fichier_level,"%c",map->tab_map[x][y]);
+		}
+		fprintf(fichier_level,"\n");
+	}
+	fclose(fichier_level);
+	Block *block;
+	block->info->index = chains->size +1;
+	block->info->author = player;
+	block->info->timestamp = (int) time();
+	block->info->name_house = nom_fichier_level;
+	block->info->posx = x;
+	block->info->posy = y;
+	block->info->hash = calc_new_hash(block);
+	stock(file_name, block, Chains, Players);
 }
