@@ -1,6 +1,7 @@
 #include "SDL_env.h"
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h" 
+#include "blockchain.h"
 #include <string.h>
 
 
@@ -21,10 +22,58 @@
 
 
 }*/
+void voisin(Map map,Sprite perso,int* tab_voisin[]){
+	int j = perso.xscroll/map.LARGEUR_TILE;
+	int i = perso.yscroll/map.HAUTEUR_TILE;
+	int v_l,v_r,v_u,v_d;
+	v_l = (int)map.props[map.tab_map[j-1][i]-'0'].env;
+	v_r =  (int)map.props[map.tab_map[j+1][i]-'0'].env;
+	v_u =  (int)map.props[map.tab_map[j][i+1]-'0'].env;
+	v_d =  (int)map.props[map.tab_map[j][i-1]-'0'].env;
+	tab_voisin[0] = v_l;
+	tab_voisin[1] = v_r ;
+	tab_voisin[2] = v_u;
+	tab_voisin[3] = v_d;
+}
 void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
-    int milieu_x,milieu_y;
+	//printf("milieux : %d;milieuy : %d\n",milieu_x,milieu_y);
+    int minx,miny,maxx,maxy;
+	int milieu_x,milieu_y;
 	milieu_x = sprite->xscroll+sprite->largeur_perso/2;
 	milieu_y = sprite->yscroll+sprite->hauteur_perso/2;
+	//condition selon X
+	//printf("milieux : %d;milieuy : %d\n",milieu_x,milieu_y);
+	if (milieu_x < map.largeur_fenetre/2)
+	{
+		minx = 0;
+		maxx = map.largeur_fenetre/map.LARGEUR_TILE;
+	}
+	else if (milieu_x >map.nb_block_largeur_monde*map.LARGEUR_TILE - map.largeur_fenetre/2)
+	{
+		minx = (map.nb_block_largeur_monde*map.LARGEUR_TILE - map.largeur_fenetre)/map.LARGEUR_TILE;
+		maxx = (map.nb_block_largeur_monde*map.LARGEUR_TILE)/map.LARGEUR_TILE;
+	}
+	else{
+		minx = (milieu_x - map.largeur_fenetre/2)/map.LARGEUR_TILE;
+		maxx = (milieu_x + map.largeur_fenetre/2)/map.LARGEUR_TILE;
+	}
+	//condition selon Y
+	if (milieu_y < map.hauteur_fenetre/2)
+	{
+		miny = 0;
+		maxy = map.hauteur_fenetre/map.HAUTEUR_TILE;
+	}
+	else if (milieu_y >map.nb_block_hauteur_monde*map.HAUTEUR_TILE - map.hauteur_fenetre/2)
+	{
+		miny = (map.nb_block_hauteur_monde*map.HAUTEUR_TILE - map.hauteur_fenetre)/map.HAUTEUR_TILE;
+		maxy = map.nb_block_hauteur_monde*map.HAUTEUR_TILE/map.HAUTEUR_TILE;
+	}
+	else{
+		miny = (milieu_y - map.hauteur_fenetre/2)/map.HAUTEUR_TILE;
+		maxy = (milieu_y + map.hauteur_fenetre/2)/map.HAUTEUR_TILE;
+	}
+	//xblock = sprite->xscroll/
+	int* tab_voisin[4];
     while( SDL_PollEvent( &event ) ){
         switch( event.type ){
             /* Look for a keypress */
@@ -37,19 +86,20 @@ void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
 						sprite->xscroll = 0;
 						sprite->position_ecran.x = sprite->xscroll;
 					}
-					
-					else if (sprite->xscroll >= map.nb_block_largeur_monde*map.LARGEUR_TILE - map.largeur_fenetre/2)
-					{
-						sprite->xscroll -= 40;
-						sprite->position_ecran.x = sprite->xscroll;
-					}
 					else if (sprite->xscroll <= map.largeur_fenetre/2)
 					{
 						sprite->xscroll -= 40;
 						sprite->position_ecran.x = sprite->xscroll;
 					}
-					else{
-						sprite->xscroll -= 40;}
+					else if (sprite->xscroll >= map.nb_block_largeur_monde*map.LARGEUR_TILE - map.largeur_fenetre/2)
+					{
+						sprite->xscroll -= 40 + minx*map.LARGEUR_TILE;
+						sprite->position_ecran.x = sprite->xscroll;						
+					}
+					else
+					{
+						sprite->xscroll -= 40;
+					}
                     break;
                 case SDLK_RIGHT:
 					if (sprite->xscroll >= map.nb_block_largeur_monde*map.LARGEUR_TILE)
@@ -57,21 +107,22 @@ void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
 						sprite->xscroll = map.nb_block_largeur_monde*map.LARGEUR_TILE;
 						sprite->position_ecran.x = sprite->xscroll;
 					}
-					else if (sprite->xscroll >= map.nb_block_largeur_monde*map.LARGEUR_TILE - map.largeur_fenetre/2)
-					{
-						sprite->xscroll += 40;
-						sprite->position_ecran.x = sprite->xscroll;
-					}
 					else if (sprite->xscroll <= map.largeur_fenetre/2)
 					{
 						sprite->xscroll += 40;
 						sprite->position_ecran.x = sprite->xscroll;
 					}
-					else{
-						sprite->xscroll += 40;}
+					else if (sprite->xscroll >= map.nb_block_largeur_monde*map.LARGEUR_TILE - map.largeur_fenetre/2)
+					{
+						sprite->xscroll += 40;
+						sprite->position_ecran.x = map.nb_block_largeur_monde*map.LARGEUR_TILE - sprite->xscroll;						
+					}
+					else
+					{
+						sprite->xscroll += 40;
+					}
                     break;
                     
-                    break;
                 case SDLK_UP:
                     sprite->yscroll -= 40;
                     break;
@@ -81,6 +132,8 @@ void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
                 case SDLK_ESCAPE:
                     (*quit) = 1;
                     break;
+				case SDLK_SPACE:
+					break;
                 default:
                     break;
             }
@@ -188,6 +241,15 @@ void ChargerMap_level(char* nom_fichier_prop,char* nom_fichier_level,Map* map){
 			else if (strcmp(buf2,"foreground")==0){
 				map->props[num_block].env = 1;
             }
+			else if (strcmp(buf2,"stairs_down")==0){
+				map->props[num_block].env = 2;
+            }
+			else if (strcmp(buf2,"stairs_up")==0){
+				map->props[num_block].env = 3;
+            }
+			else if (strcmp(buf2,"house")==0){
+				map->props[num_block].env = 4;
+            }
 		}
 	}
     fclose(fichier_prop);
@@ -224,8 +286,33 @@ void ChargerMap_level(char* nom_fichier_prop,char* nom_fichier_level,Map* map){
 		//printf("ligne :%s end\n",map->tab_map[j]);
     }
     
-}    
-
+} 
+   
+void save_map(char* file_name, char* nom_fichier_level,Map* map, char* player, Blockchain* Chains, Arena* Players){
+	FILE* fichier_level;
+    fichier_level = fopen(nom_fichier_level,"w");
+	int x,y;
+	x = map->nb_block_largeur_monde;
+	y = map->nb_block_hauteur_monde;
+	fprintf(fichier_level,"%d %d\n",x,y);
+	for (int i =0;i<y;i++){
+		for (int j = 0; j < x; j++)
+		{
+			fprintf(fichier_level,"%c",map->tab_map[x][y]);
+		}
+		fprintf(fichier_level,"\n");
+	}
+	fclose(fichier_level);
+	Block* block;
+	block->index = chain->size +1;
+	block->author = player;
+	block->timestamp = (int) time();
+	block->name_house = nom_fichier_level;
+	block->posx = x;
+	block->posy = y;
+	block->hash = calc_new_hash(block);
+	stock(file_name, block, Chains, Players);
+}
 
 void FreeMap(Map* map)
 {
@@ -236,4 +323,161 @@ void FreeMap(Map* map)
 	free(map->tab_map);
 	free(map->props);
 	free(map);
+} 
+
+
+void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_Surface* screen,int largeurscreen,int hauteurscreen){
+	//menu = NULL;
+	SDL_Rect pos_play;
+    SDL_Rect pos_exit;
+	menu->exit_enfonce =0;
+	menu->play_enfonce =0;
+	menu->image_play_default = IMG_Load("image_menu/Play_default.bmp");
+	menu->image_exit_default = IMG_Load("image_menu/exit_default.bmp");
+	menu->image_play_enfonce = IMG_Load("image_menu/play_enfonce.bmp");
+	menu->image_exit_enfonce = IMG_Load("image_menu/exit_enfonce.bmp");
+	pos_play.x = largeurscreen/2 - menu->image_play_default->w/2;
+	pos_play.h = menu->image_play_default->h;
+	pos_play.w = menu->image_play_default->w;
+	pos_play.y = hauteurscreen/4;
+	pos_exit.x = pos_play.x;
+	pos_exit.y = hauteurscreen/2;
+	pos_exit.h = menu->image_exit_default->h;
+	pos_exit.w = menu->image_exit_default->w;		
+	SDL_BlitSurface(menu->image_exit_default,NULL,screen,&pos_exit);
+	SDL_BlitSurface(menu->image_play_default,NULL,screen,&pos_play);
+	while( SDL_PollEvent( &event ) ){
+		if( event.type == SDL_MOUSEBUTTONUP ){
+			if (event.button.button == SDL_BUTTON_LEFT){
+				menu->play_enfonce = check_click_in_rect(event.button.x,event.button.y,&pos_play);
+				menu->exit_enfonce = check_click_in_rect(event.button.x,event.button.y,&pos_exit);
+				printf("%d %d\n",menu->play_enfonce,menu->exit_enfonce);
+				if (menu->play_enfonce == 1){
+					pos_play.h = menu->image_play_enfonce->h;
+					pos_play.w = menu->image_play_enfonce->w;
+					SDL_FillRect(screen,NULL,0x000000);
+					SDL_BlitSurface(menu->image_exit_default,NULL,screen,&pos_exit);
+					apply_surface(pos_play.x,pos_play.y,menu->image_play_enfonce,screen);
+					SDL_Flip(screen);
+					(*quit_game) = 0;
+				}
+				if (menu->exit_enfonce == 1)
+				{
+					pos_exit.h = menu->image_exit_enfonce->h;
+					pos_exit.w = menu->image_exit_enfonce->w;
+					SDL_FillRect(screen,NULL,0x000000);
+					SDL_BlitSurface(menu->image_play_default,NULL,screen,&pos_play);
+					apply_surface(pos_exit.x,pos_exit.y,menu->image_exit_enfonce,screen);
+					SDL_Flip(screen);
+					(*quit_menu) = 1;
+				}
+			}
+		}
+	}
+}
+
+
+
+
+void new_house(char* nom_fichier_level,int x,int y){
+	FILE* fichier_level;
+    fichier_level = fopen(nom_fichier_level,"w");
+	fprintf(fichier_level,"%d %d\n",x,y);
+	for (int i =0;i<y;i++){
+		for (int j = 0; j < x; j++)
+		{
+			fprintf(fichier_level,"0");
+		}
+		fprintf(fichier_level,"\n");
+	}
+	fclose(fichier_level);
+}
+
+void world(char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde){
+	//Map monde;
+	int* v[4];
+	int quit_world = 0;
+	int x_monde,y_monde;
+	int x,y;
+	int minx,miny,maxx,maxy;
+	int milieu_x,milieu_y;
+	while (!quit_world){
+
+		milieu_x = perso->xscroll+perso->largeur_perso/2;
+		milieu_y = perso->yscroll+perso->hauteur_perso/2;
+		//condition selon X
+		//printf("milieux : %d;milieuy : %d\n",milieu_x,milieu_y);
+		if (milieu_x < monde.largeur_fenetre/2)
+		{
+			minx = 0;
+			maxx = monde.largeur_fenetre/monde.LARGEUR_TILE;
+		}
+		else if (milieu_x >monde.nb_block_largeur_monde*monde.LARGEUR_TILE - monde.largeur_fenetre/2)
+		{
+			minx = (monde.nb_block_largeur_monde*monde.LARGEUR_TILE - monde.largeur_fenetre)/monde.LARGEUR_TILE;
+			maxx = (monde.nb_block_largeur_monde*monde.LARGEUR_TILE)/monde.LARGEUR_TILE;
+		}
+		else{
+			minx = (milieu_x - monde.largeur_fenetre/2)/monde.LARGEUR_TILE;
+			maxx = (milieu_x + monde.largeur_fenetre/2)/monde.LARGEUR_TILE;
+		}
+		//condition selon Y
+		if (milieu_y < monde.hauteur_fenetre/2)
+		{
+			miny = 0;
+			maxy = monde.hauteur_fenetre/monde.HAUTEUR_TILE;
+		}
+		else if (milieu_y >monde.nb_block_hauteur_monde*monde.HAUTEUR_TILE - monde.hauteur_fenetre/2)
+		{
+			miny = (monde.nb_block_hauteur_monde*monde.HAUTEUR_TILE - monde.hauteur_fenetre)/monde.HAUTEUR_TILE;
+			maxy = monde.nb_block_hauteur_monde*monde.HAUTEUR_TILE/monde.HAUTEUR_TILE;
+		}
+		else{
+			miny = (milieu_y - monde.hauteur_fenetre/2)/monde.HAUTEUR_TILE;
+			maxy = (milieu_y + monde.hauteur_fenetre/2)/monde.HAUTEUR_TILE;
+		}
+		//voisin(monde,(*perso),v);
+		Bouge_sprite(event,perso,&quit_world,monde);
+        Afficher(screen,monde,perso);
+        affichersprite(screen,perso);
+
+		x_monde = minx*monde.LARGEUR_TILE + perso->xscroll;
+		y_monde = miny*monde.HAUTEUR_TILE + perso->yscroll;
+		if (monde.tab_map[x_monde][y_monde] == 4){
+			quit_world = 1;
+		}
+		SDL_Flip(screen);
+	}
+}
+void editor(char* nom_fichier_prop,char* nom_fichier_level,Map* map){
+
+}
+void game(){
+	init_SDL();
+    SDL_Surface *screen;
+    Sprite *perso;
+    perso = InitialiserSprite(320,240,320,240,"image_block/perso.bmp");
+	Map W;
+    SDL_Event event;
+    int quit_menu = 0;
+    int quit_game = 1;
+    MainMenu menu;
+    screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE|SDL_DOUBLEBUF); // Ouverture de la fenêtre
+    SDL_WM_SetCaption("Blockcraft XD", NULL);//faut choisir un nom :)
+	while (!quit_menu)
+	{
+		main_Menu(&menu,event,&quit_menu,&quit_game,screen,640,480);
+		while (!quit_game)
+		{
+			world("level/level_prop.txt","level/world.txt",screen,event,perso,W);
+		}
+		
+	}
+	
+
+    SDL_Quit(); // Arrêt de la SDL
+}
+
+void affichersprite(SDL_Surface* screen,Sprite *sprite){
+    SDL_BlitSurface(sprite->image_sprite,NULL,screen,&sprite->position_ecran);
 }

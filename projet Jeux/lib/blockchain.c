@@ -1,4 +1,5 @@
 #include "blockchain.h"
+#include "../lib/SDL_env.c"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -6,8 +7,7 @@
 #define MAX_PLAYERS 10
 //On met en place les parametres de hachage
 #define HASH_SIZE		37987	/* Prime number */
-#define BASE			128
-
+#define HASH_KEY		127
 
 
 //Procedures de bases des blockchains
@@ -23,56 +23,24 @@ void calc_new_hash(Block* block)    //Calcule le hash du nouveau bloc
     int index = block->info->index;
     char* author = block->info->author;
     int timestamp = block->info->timestamp;
-    hash = hash_index(index) + hash_author(author) + hash_timestamp(timestamp);
+    hash = (index*HASH_KEY + (int) author) * hash_timestamp(timestamp);
     block->info->hash = hash;
 }
 
-unsigned long hash_index(int index)     //Calcule le hash pour un entier
-{
-    unsigned long hashValue = 0;
-    int i = 0;
-    char* date = itoa(index);   //Convertit un entier en char ASCII
-    while ((*date) != '\0')
-    {
-        hashValue += hashValue % HASH_SIZE + ((*string) * (int) pow (BASE, i) )% HASH_SIZE;
-        i++;
-        string++;
-    }
-    return hashValue % HASH_SIZE;
-}
-
-unsigned long hash_author(char* author)     //Calcule le hash pour une chaine de caracteres
-{
-    unsigned long hashValue = 0;
-    int i = 0;
-    while ((*author) != '\0')
-    {
-        hashValue += hashValue % HASH_SIZE + ((*string) * (int) pow (BASE, i) )% HASH_SIZE;
-        i++;
-        string++;
-    }
-    return hashValue % HASH_SIZE;
-}
 
 unsigned long hash_timestamp(int timestamp)
 {
     unsigned long hashValue = 0;
-    int i = 0;
-    char* date = itoa(timestamp);   //Convertit un entier en char ASCII
-    while ((*date) != '\0')
-    {
-        hashValue += hashValue % HASH_SIZE + ((*string) * (int) pow (BASE, i) )% HASH_SIZE;
-        i++;
-        string++;
-    }
+    hashValue = timestamp / 8;	//on cherche a perdre de la donnee binaire
+    hashValue = hashValue*HASH_KEY;
     return hashValue % HASH_SIZE;
 }
 
-void stock(char* file_name, Block* block, Blockchain* Chains)     //On ajoute un bloc a la chaine, a repeter pour tout les joueurs
+void stock(char* file_name, Block* block, Blockchain* Chains, Arena* Players)     //On ajoute un bloc a la chaine, a repeter pour tout les joueurs
 {
-    if (proof_of_work(block, Chains)) //Si le block est valide on l'ajoute sur la chaine de chaque joueur
+    if (proof_of_work(block, Chains, Players)) //Si le block est valide on l'ajoute sur la chaine de chaque joueur
     {
-        for (int player = 0; player<length(Players); player ++)
+        for (int player = 0; player<Players->nb_players; player ++)
         {
             Chains[player].size ++;
             block->previous_hash = Chains[player].head->info->hash;
@@ -82,24 +50,28 @@ void stock(char* file_name, Block* block, Blockchain* Chains)     //On ajoute un
     }
     else
     {
-        printf("Arretez de faire de la mierda on est serieux ici XD")
+        printf("C'est insalubre comme etablissement");
     }
     
 }
 
 //!!\\ reste a voir pour que les maisons ne se superposent pas
-int proof_of_work(Block* block, Blockchain* Chains)      //On teste que le nouveau bloc est bien present chez tout les joueurs
+int proof_of_work(Block* block, Blockchain* Chains, Arena* Players)      //On teste que le nouveau bloc est bien present chez tout les joueurs
 {
-    if ((block->info->house_info->total_rooms < 3) || (block->info->house_info->nb_kitchen < 1) || (block->info->house_info->nb_bedroom < 1) || (block->info->house_info->nb_WC < 1)
+	FILE f_house = fopen(block->info->name_house, "r");
+	int x_size, y_size;
+	fscanf(&f_house, "%d %d", &x_size, &y_size);
+	house_size = x_size * y_size;
+    if (house_size < 25)
             {
-                return 0; //On suppose qu'une maison doit comporter au moins une chambre, une salle de bain et une cuisine donc au moins 3 pieces
+                return 0; //On suppose qu'une maison doit avoir une taille minimum de 25m2
             }
     //Si la maison est valide on verifie quelle est bien coherente avec toute les chaines du reseau
     int correct, wrong;
-    for (int player = 0; player<length(Players); player ++)
+    for (int player = 0; player<Players->nb_players; player ++)
     {
         
-        else if (Chains[player].head->info->hash == block->previous_hash && Chains[player].head->info->index == block->info->index-1)
+        if (Chains[player].head->info->hash == block->previous_hash && Chains[player].head->info->index == block->info->index-1)
         {
             correct ++;
         }
@@ -119,19 +91,19 @@ int proof_of_work(Block* block, Blockchain* Chains)      //On teste que le nouve
 }
 
 //Procedures de recuperation et sauvegarde de blockchains
-void save_write(char* file_name, Block* block);
+void save_write(char* file_name, Block* block)
 {
-
+	
 }
 
-Blockchain* get_save(char* file_name, Blockchain* Chains);
+Blockchain* get_save(char* file_name)
 {
     Blockchain* new_chain;
     init_blockchain(new_chain);
-    File file;
+    FILE file;
     file = fopen(file_name, "w");
     Block* block;
-    while (fscanf(file, "%s %s %s %s %s %s",block->info->index, block->info->author, block->info->timestamp, block->info->message, block->info->hash, block->previous_hash) == 6)
+    while (fscanf(&file, "%d %s %d %s %d %d",&block->info->index, block->info->author, &block->info->timestamp, block->info->name_house, &block->info->hash, &block->previous_hash) == 6)
     {
         new_chain->size ++;
         block->previous_hash = new_chain->head->info->hash;
