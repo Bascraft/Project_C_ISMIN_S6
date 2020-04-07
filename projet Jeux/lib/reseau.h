@@ -1,7 +1,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../lib/blockchain.h"
+#include "blockchain.h"
 
 typedef struct 
 {

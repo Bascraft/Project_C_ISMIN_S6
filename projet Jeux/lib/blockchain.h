@@ -1,4 +1,5 @@
-#include "../lib/SDL_env.c"
+#include "../lib/SDL_env.h"
+
 
 typedef struct
 {
@@ -11,11 +12,13 @@ typedef struct
     int hash;
 } Info;
 
-typedef struct
+typedef struct Block Block;
+struct Block
 {
     Info* info;
     int previous_hash;
-} Block;
+    Block* suivant;
+};
 
 typedef struct
 {
@@ -27,19 +30,17 @@ typedef struct
 typedef struct
 {
     int nb_players;
-    char* list;
+    char list[9];
 } Arena;
 
 //Procedures de bases des blockchains
-void init_blockchain(Blockchain* chain);
+Blockchain* init_blockchain(int player);
 void calc_new_hash(Block* block);
-unsigned long hash_index(int index);
-unsigned long hash_author(char* author);
 unsigned long hash_timestamp(int timestamp);
-void stock(char* file_name, Block* block, Blockchain* chain, Arena* Players);
-int proof_of_work(Block* block, Blockchain* Chains, Arena* Players);
+void stock(char* file_name, Block* block, Blockchain* Chains[9], Arena* Players);
+int proof_of_work(Block* block, Blockchain* Chains[9], Arena* Players);
 
 //Procedures de recuperation et sauvegarde de la blockchain
 void save_write(char* file_name, Block* block);
-Blockchain* get_save(char* file_name, Blockchain* Chains);
-void save_map(char* file_name, char* nom_fichier_level,Map* map, char* player, Blockchain* Chains, Arena* Players);
+Blockchain* get_save(char* file_name, int player);
+//void save_map(char* file_name, char* nom_fichier_level,Map* map, char* player, Blockchain* Chains[9], Arena* Players, int nb_house);

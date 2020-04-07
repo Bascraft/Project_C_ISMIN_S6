@@ -1,7 +1,8 @@
 //image de la taille de 40x40
 #include "SDL_base.h"
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h" 
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+//#include "SDL/SDL_ttf.h"
 #include <string.h>
 #include "SDL_perso.h"
 
@@ -36,14 +37,16 @@ typedef struct MainMenu {
 
 //fonction qui initialise la map en mettant tous avec de la grass
 //void init_map(Map *map);
-void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map);
+void new_house(int x,int y,int taille_x,int taille_y);
+int Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map);
 void Afficher(SDL_Surface* screen,Map map,Sprite *sprite);
 void ChargerMap_level(char *nom_fichier_prop,char* nom_fichier_level,Map* map);
+void save_map(char* nom_fichier_level,Map* map);
 void FreeMap(Map* map);
 void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_Surface* screen,int largeurscreen,int hauteurscreen);
 
-void new_house(char* nom_fichier_level,int x,int y);
-void world(char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde);
-void editor(char* nom_fichier_prop,char* nom_fichier_level,Map* map);
+
+int world(char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde,Map maisons);
+void in_house(SDL_Surface* screen,SDL_Event event,Sprite *perso,Map map);
 void game();
 void affichersprite(SDL_Surface* screen,Sprite *sprite);

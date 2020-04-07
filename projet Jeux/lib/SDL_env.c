@@ -21,7 +21,7 @@
 
 
 }*/
-void voisin(Map map,Sprite perso,int* tab_voisin[]){
+/*void voisin(Map map,Sprite perso,int* tab_voisin[]){
 	int j = perso.xscroll/map.LARGEUR_TILE;
 	int i = perso.yscroll/map.HAUTEUR_TILE;
 	int v_l,v_r,v_u,v_d;
@@ -33,8 +33,25 @@ void voisin(Map map,Sprite perso,int* tab_voisin[]){
 	tab_voisin[1] = v_r ;
 	tab_voisin[2] = v_u;
 	tab_voisin[3] = v_d;
+}*/
+
+void new_house(int x,int y,int taille_x,int taille_y){
+	char* nom_fichier_level;
+	snprintf(nom_fichier_level,11*sizeof(char)+2*sizeof(int),"level/%d_%d.txt",x,y);
+	FILE* fichier_level;
+    fichier_level = fopen(nom_fichier_level,"w");
+	fprintf(fichier_level,"%d %d\n",taille_x,taille_y);
+	for (int i =0;i<taille_y;i++){
+		for (int j = 0; j < taille_x; j++)
+		{
+			fprintf(fichier_level,"0");
+		}
+		fprintf(fichier_level,"\n");
+	}
+	fclose(fichier_level);
 }
-void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
+
+int Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
 	//xblock = sprite->xscroll/
 	int minx,miny,maxx,maxy;
 	int milieu_x,milieu_y;
@@ -169,7 +186,9 @@ void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
                 case SDLK_ESCAPE:
                     (*quit) = 1;
                     break;
-				case SDLK_SPACE:
+				case SDLK_w:
+					map.tab_map[sprite->yscroll/map.LARGEUR_TILE + 1][sprite->xscroll/map.HAUTEUR_TILE] = '8';//creation maison 
+					//new_house(sprite->yscroll/map.LARGEUR_TILE + 1,sprite->xscroll/map.HAUTEUR_TILE,10,10);
 					break;
 				case SDLK_a:
 					map.tab_map[sprite->yscroll/map.LARGEUR_TILE][sprite->xscroll/map.HAUTEUR_TILE] = '0';// met bloc de terre 
@@ -195,8 +214,9 @@ void Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
 
             }
         }
-    printf("xscroll = %d;yscroll = %d\n",sprite->xscroll,sprite->yscroll);
-	printf("xdest = %d;ydest = %d\n",sprite->position_ecran.x,sprite->position_ecran.y);
+    //printf("xscroll = %d;yscroll = %d\n",sprite->xscroll,sprite->yscroll);
+	return 0;
+	//printf("xdest = %d;ydest = %d\n",sprite->position_ecran.x,sprite->position_ecran.y);
 }
 void Afficher(SDL_Surface* screen,Map map,Sprite *sprite)
 {
@@ -240,7 +260,7 @@ void Afficher(SDL_Surface* screen,Map map,Sprite *sprite)
 		miny = (milieu_y - map.hauteur_fenetre/2)/map.HAUTEUR_TILE;
 		maxy = (milieu_y + map.hauteur_fenetre/2)/map.HAUTEUR_TILE;
 	}
-	printf("minx = %d;miny = %d;maxx = %d;maxy = %d\n",minx,miny,maxx,maxy);
+	//printf("minx = %d;miny = %d;maxx = %d;maxy = %d\n",minx,miny,maxx,maxy);
 	for(i=minx;i<maxx;i++)//y
 	{   
         //printf("ligne : %s\n",map.tab_map[i]);
@@ -280,7 +300,7 @@ void ChargerMap_level(char* nom_fichier_prop,char* nom_fichier_level,Map* map){
     fscanf(fichier_prop,"%d %d",&map->nb_blockX_tileset,&map->nb_blockY_tileset);
     map->LARGEUR_TILE = map->image_block->w/map->nb_blockX_tileset;
 	map->HAUTEUR_TILE = map->image_block->h/map->nb_blockY_tileset;
-    map->props = malloc(map->nb_blockX_tileset*map->nb_blockY_tileset*sizeof(TileProp));
+    map->props = (TileProp*)malloc(map->nb_blockX_tileset*map->nb_blockY_tileset*sizeof(TileProp));
     for(j=0,num_block=0;j<map->nb_blockY_tileset;j++)
 	{
 		for(i=0;i<map->nb_blockX_tileset;i++,num_block++)
@@ -308,15 +328,15 @@ void ChargerMap_level(char* nom_fichier_prop,char* nom_fichier_level,Map* map){
 		}
 	}
     fclose(fichier_prop);
-    free(fichier_prop);
+    //free(fichier_prop);
     FILE* fichier_level;
     fichier_level = fopen(nom_fichier_level,"r");
     fscanf(fichier_prop,"%d %d",&map->nb_block_largeur_monde,&map->nb_block_hauteur_monde); // taille du monde
     //printf("taille monde : %d %d\n",map->nb_block_largeur_monde,map->nb_block_hauteur_monde);
     //allocation memoire
-    map->tab_map = malloc(map->nb_block_hauteur_monde*sizeof(blockind*));
+    map->tab_map = (blockind**)malloc(map->nb_block_hauteur_monde*sizeof(blockind*));
     for(i=0;i<map->nb_block_hauteur_monde;i++){
-		map->tab_map[i] = malloc(map->nb_block_largeur_monde*sizeof(blockind));
+		map->tab_map[i] = (blockind*)malloc((map->nb_block_largeur_monde+1)*sizeof(blockind));
     }
     //importation donnee
     for(j=0;j<map->nb_block_largeur_monde;j++)
@@ -330,7 +350,8 @@ void ChargerMap_level(char* nom_fichier_prop,char* nom_fichier_level,Map* map){
 			/*if (tmp>=map->nb_blockX_tileset*map->nb_blockY_tileset){
 				ErrorQuit("level tile hors limite\n");
             }*/
-			//map->tab_map[j][i] = (char)tmp;
+			//fscanf(fichier_level,"%d",&tmp);
+			//map->tab_map[j][i] = tmp;
             //printf("tile %d %d est %d\n",i,j,map->tab_map[j][i]);
 		}
         map->tab_map[j][map->nb_block_largeur_monde] = 0;
@@ -338,13 +359,13 @@ void ChargerMap_level(char* nom_fichier_prop,char* nom_fichier_level,Map* map){
 			printf("tab: %d",map->tab_map[j][k]);
 		}*/
 
-		//printf("ligne :%s end\n",map->tab_map[j]);
+		printf("ligne :%s end\n",map->tab_map[j]);
     }
-    
+    fclose(fichier_level);
 }    
 
 
-void FreeMap(Map* map)
+/*void FreeMap(Map* map)
 {
 	int i;
 	SDL_FreeSurface(map->image_block);
@@ -353,8 +374,23 @@ void FreeMap(Map* map)
 	free(map->tab_map);
 	free(map->props);
 	free(map);
-} 
-
+} */
+void save_map(char* nom_fichier_level,Map* map){
+	FILE* fichier_level;
+    fichier_level = fopen(nom_fichier_level,"w");
+	int x,y;
+	x = map->nb_block_largeur_monde;
+	y = map->nb_block_hauteur_monde;
+	fprintf(fichier_level,"%d %d\n",x,y);
+	for (int i =0;i<y;i++){
+		for (int j = 0; j < x; j++)
+		{
+			fprintf(fichier_level,"%c",map->tab_map[x][y]);
+		}
+		fprintf(fichier_level,"\n");
+	}
+	fclose(fichier_level);
+	}
 
 void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_Surface* screen,int largeurscreen,int hauteurscreen){
 	//menu = NULL;
@@ -410,21 +446,8 @@ void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_
 
 
 
-void new_house(char* nom_fichier_level,int x,int y){
-	FILE* fichier_level;
-    fichier_level = fopen(nom_fichier_level,"w");
-	fprintf(fichier_level,"%d %d\n",x,y);
-	for (int i =0;i<y;i++){
-		for (int j = 0; j < x; j++)
-		{
-			fprintf(fichier_level,"0");
-		}
-		fprintf(fichier_level,"\n");
-	}
-	fclose(fichier_level);
-}
 
-void world(char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde){
+int world(char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde,Map maison){
 	//Map monde;
 
 	int* v[4];
@@ -473,40 +496,34 @@ void world(char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SD
         Afficher(screen,monde,perso);
         affichersprite(screen,perso);
 
-		/*x_monde = minx*monde.LARGEUR_TILE + perso->xscroll;
-		y_monde = miny*monde.HAUTEUR_TILE + perso->yscroll;
-		if (monde.tab_map[x_monde][y_monde] == 4){
-			quit_world = 1;
-		}*/
+		x_monde = perso->xscroll/monde.LARGEUR_TILE;
+		y_monde = perso->yscroll/monde.HAUTEUR_TILE;
+        int numblock = monde.tab_map[y_monde][x_monde]-'0';
+		printf("%d %d\n",x_monde,y_monde);
+		printf("%d\n",numblock);
+		if (monde.props[numblock].env == 4){
+			//char* nom_fichier_level;
+			//snprintf(nom_fichier_level,11*sizeof(char)+2*sizeof(int),"level/%d_%d.txt",x,y);
+			
+			in_house(screen,event,perso,maison);
+		}
 		SDL_Flip(screen);
 	}
-}
-void editor(char* nom_fichier_prop,char* nom_fichier_level,Map* map){
-
-}
-void game(){
-	init_SDL();
-    SDL_Surface *screen;
-    Sprite *perso;
-    perso = InitialiserSprite(320,240,320,240,"image_block/perso.bmp");
-	Map W;
-    SDL_Event event;
-    int quit_menu = 0;
-    int quit_game = 1;
-    MainMenu menu;
-    screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE|SDL_DOUBLEBUF); // Ouverture de la fenêtre
-    SDL_WM_SetCaption("Blockcraft XD", NULL);//faut choisir un nom :)
-	while (!quit_menu){
-        main_Menu(&menu,event,&quit_menu,&quit_game,screen,640,480);
-        SDL_Flip(screen);}
-	if (quit_game == 2){
-		ChargerMap_level("level/level_prop.txt","level/level.txt",&W);
-    	world("level/level_prop.txt","level/level.txt",screen,event,perso,W);}
-		
+	return 2;
 	
-
-    SDL_Quit(); // Arrêt de la SDL
 }
+void in_house(SDL_Surface* screen,SDL_Event event,Sprite *perso,Map house){
+	int quit_house = 0;
+	while (!quit_house)
+	{
+		Bouge_sprite(event,perso,&quit_house,house);
+        Afficher(screen,house,perso);
+        affichersprite(screen,perso);
+		SDL_Flip(screen);
+	}
+	
+}
+
 
 void affichersprite(SDL_Surface* screen,Sprite *sprite){
     SDL_BlitSurface(sprite->image_sprite,NULL,screen,&sprite->position_ecran);

@@ -1,5 +1,5 @@
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h" 
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h> 
 //#define hauteur 480
 //#define largeur 640
 //cree la variable ecran extern et global
