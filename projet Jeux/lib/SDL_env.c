@@ -1,8 +1,8 @@
 #include "SDL_env.h"
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h" 
 #include <string.h>
-
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <string.h>
 
 /*void init_map(Map *map){
     int i,j;
@@ -37,7 +37,9 @@
 
 void new_house(int x,int y,int taille_x,int taille_y){
 	char* nom_fichier_level;
+	nom_fichier_level = (char*)malloc(11*sizeof(char)+2*sizeof(int));
 	snprintf(nom_fichier_level,11*sizeof(char)+2*sizeof(int),"level/%d_%d.txt",x,y);
+	printf("%s\n",nom_fichier_level);
 	FILE* fichier_level;
     fichier_level = fopen(nom_fichier_level,"w");
 	fprintf(fichier_level,"%d %d\n",taille_x,taille_y);
@@ -187,7 +189,7 @@ int Bouge_sprite(SDL_Event event,Sprite *sprite,int *quit,Map map){
                     (*quit) = 1;
                     break;
 				case SDLK_w:
-					map.tab_map[sprite->yscroll/map.LARGEUR_TILE + 1][sprite->xscroll/map.HAUTEUR_TILE] = '8';//creation maison 
+					map.tab_map[sprite->yscroll/map.LARGEUR_TILE ][sprite->xscroll/map.HAUTEUR_TILE] = '8';//creation maison 
 					//new_house(sprite->yscroll/map.LARGEUR_TILE + 1,sprite->xscroll/map.HAUTEUR_TILE,10,10);
 					break;
 				case SDLK_a:
@@ -409,9 +411,21 @@ void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_
 	pos_exit.x = pos_play.x;
 	pos_exit.y = hauteurscreen/2;
 	pos_exit.h = menu->image_exit_default->h;
-	pos_exit.w = menu->image_exit_default->w;		
-	SDL_BlitSurface(menu->image_exit_default,NULL,screen,&pos_exit);
-	SDL_BlitSurface(menu->image_play_default,NULL,screen,&pos_play);
+	pos_exit.w = menu->image_exit_default->w;	
+	if ((*quit_game) == 1){	
+		SDL_BlitSurface(menu->image_exit_default,NULL,screen,&pos_exit);
+		SDL_BlitSurface(menu->image_play_default,NULL,screen,&pos_play);
+	}
+	if ((*quit_game) == 3)
+	{
+		SDL_Surface* image = IMG_Load("image_menu/but_jeu.bmp");
+		SDL_BlitSurface(image,NULL,screen,NULL);
+	}
+	if ((*quit_game) == 4)
+	{
+		SDL_Surface* image = IMG_Load("image_menu/Instructions.bmp");
+		SDL_BlitSurface(image,NULL,screen,NULL);
+	}
 	while( SDL_PollEvent( &event ) ){
 		if( event.type == SDL_MOUSEBUTTONUP ){
 			if (event.button.button == SDL_BUTTON_LEFT){
@@ -425,8 +439,8 @@ void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_
 					SDL_BlitSurface(menu->image_exit_default,NULL,screen,&pos_exit);
 					apply_surface(pos_play.x,pos_play.y,menu->image_play_enfonce,screen);
 					SDL_Flip(screen);
-					(*quit_game) = 2;
-					(*quit_menu) = 1;
+					(*quit_game) = 3;
+					//(*quit_menu) = 1;
 				}
 				if (menu->exit_enfonce == 1)
 				{
@@ -440,14 +454,27 @@ void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_
 				}
 			}
 		}
+		if (event.type == SDL_KEYDOWN ){
+			if(event.key.keysym.sym == SDLK_SPACE && ((*quit_game) == 3)){
+				(*quit_game) = 4;
+			}
+			else if(event.key.keysym.sym == SDLK_SPACE && ((*quit_game) == 4)){
+				(*quit_game) = 2;
+				(*quit_menu) = 1;
+
+			}
+		}
 	}
+
+	//printf("%d",(*quit_game));
+	
 }
 
 
 
 
 
-int world(char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde,Map maison){
+int world(int nb_house,char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde,Map maison){
 	//Map monde;
 
 	int* v[4];
@@ -504,15 +531,22 @@ int world(char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL
 		if (monde.props[numblock].env == 4){
 			//char* nom_fichier_level;
 			//snprintf(nom_fichier_level,11*sizeof(char)+2*sizeof(int),"level/%d_%d.txt",x,y);
-			
-			in_house(screen,event,perso,maison);
+			Block *block = NULL;
+   			block = (Block*)malloc(sizeof(Block));
+    		block->info = (Info*)malloc(sizeof(Info));
+			block = find_block(Chains[0],x_monde,y_monde);
+			/*if (block == NULL){// quand il trouve pas 
+				make_block(file_name_blockchain,player,&Chains[9],Players,&nb_house,perso,&maison,0,block);
+			}
+			printf("init_done");*/
+			//in_house(file_name_blockchain,player,&Chains[9],Players,&nb_house,screen,event,perso,(*block->info->house_info),block);
 		}
 		SDL_Flip(screen);
 	}
 	return 2;
 	
 }
-void in_house(SDL_Surface* screen,SDL_Event event,Sprite *perso,Map house){
+void in_house(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,int *nb_house,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map house,Block *block){
 	int quit_house = 0;
 	while (!quit_house)
 	{
@@ -521,10 +555,249 @@ void in_house(SDL_Surface* screen,SDL_Event event,Sprite *perso,Map house){
         affichersprite(screen,perso);
 		SDL_Flip(screen);
 	}
-	
+	make_block(file_name_blockchain,player,&Chains[9],Players,nb_house,perso,&house,1,block);
 }
 
 
 void affichersprite(SDL_Surface* screen,Sprite *sprite){
     SDL_BlitSurface(sprite->image_sprite,NULL,screen,&sprite->position_ecran);
+}
+
+
+//Procedures de bases des blockchains
+Blockchain* init_blockchain(int player)     //Initialise la chaine de bloc
+{
+    Blockchain* chain = (Blockchain*)malloc(sizeof(Blockchain));
+    chain->head = (Block*)malloc(sizeof(Block));
+    chain->head->info = (Info*)malloc(sizeof(Info));
+    chain->courant = (Block*)malloc(sizeof(Block));
+    chain->courant->info = (Info*)malloc(sizeof(Info));
+    Block* block = (Block*)malloc(sizeof(Block));
+    block->info = (Info*)malloc(sizeof(Info));
+    if (chain == NULL || block == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
+
+    //block->info = NULL;
+    block->previous_hash = 0;
+    block->suivant = NULL;
+
+    chain->size = 0;
+    chain->head = block;
+    chain->courant = block;
+    char player_name = (char) player;
+    chain->player = player_name;
+
+    return chain;
+}
+
+void calc_new_hash(Block* block)    //Calcule le hash du nouveau bloc
+{
+    int hash;
+    int index = block->info->index;
+    int author;
+    sscanf(block->info->author,"%d", &author); //on convertit author en entier
+    int timestamp = block->info->timestamp;
+    hash = floor((index*HASH_KEY + author) % hash_timestamp(timestamp));
+    if (block->previous_hash != 0)
+    {
+        //hash = hash % block->previous_hash;
+    }
+    block->info->hash = hash;
+}
+
+
+unsigned long hash_timestamp(int timestamp)
+{
+    unsigned long hashValue = 0;
+    hashValue = timestamp / 8;	//on cherche a perdre de la donnee binaire
+    hashValue = hashValue*HASH_KEY;
+    return hashValue % HASH_SIZE;
+}
+
+void stock(char* file_name, Block* block, Blockchain* Chains[9], Arena* Players, int* nb_house)     //On ajoute un bloc a la chaine, a repeter pour tout les joueurs
+{
+    int ref_player = 0;
+    Blockchain* chain = init_blockchain(Players->list[ref_player]);
+    chain = Chains[ref_player];
+    int hash = chain->courant->info->hash;
+    block->previous_hash = hash;
+
+    if (proof_of_work(block, Chains, Players)) //Si le block est valide on l'ajoute sur la chaine de chaque joueur
+    {
+        (*nb_house) ++;
+        chain->size ++;
+        chain->courant->suivant = block;
+        chain->courant = block;
+        for (int player = 0; player<Players->nb_players; player ++)
+        {
+            
+            Chains[player] = chain;
+            //printf("player : %d\nsize : %d\n", player, Chains[player]->size);
+            //Chains[player]->courant->suivant = block;
+            //Chains[player]->courant = block;
+        }
+        save_write(file_name, block);
+    }
+}
+
+int proof_of_work(Block* block, Blockchain* Chains[9], Arena* Players)      //On teste que le nouveau bloc est bien present chez tout les joueurs
+{
+    FILE *f_house; 
+    f_house = fopen(block->info->name_house, "r");
+	int x_size, y_size;
+	fscanf(f_house, "%d %d", &x_size, &y_size);
+    int house_size;
+	house_size = x_size * y_size;
+    if (house_size < 25)
+        {
+            printf("Une habitation doit faire plus de 25m2 pour être valide.\n");
+            return 0; //On suppose qu'une maison doit avoir une taille minimum de 25m2
+        }
+    //Si la maison est valide on verifie quelle est bien coherente avec toute les chaines du reseau
+    int correct = 0;
+	int wrong = 0;
+    Blockchain* chain = init_blockchain(Players->list[0]);
+    Block* block_test = (Block*)malloc(sizeof(Block));
+    block_test->info = (Info*)malloc(sizeof(Info));
+    for (int player = 0; player<Players->nb_players; player ++)
+    {
+        //printf("player : %d\nsize : %d\n", player, Chains[player]->size);
+        if (Chains[0]->size == 0)
+        {
+            return 1;   //C'est la premiere maison construite
+        }
+        else
+        {
+            chain = Chains[player];
+            block_test->info = chain->courant->info;
+            int previous_hash = block->previous_hash;
+            int hash = chain->courant->info->hash;
+            if (hash == previous_hash)
+            {
+                if (Chains[player]->courant->info->index == block->info->index-1)
+                {
+                    correct ++;
+                }
+                else
+                {
+                    wrong ++;
+                }
+            }
+            else
+            {
+                wrong ++;
+            }
+        }
+    }
+    if (correct >= wrong)
+    {
+        printf("correct\n");
+        return 1;
+    }
+    else
+    {
+        printf("wrong...\n");
+        return 0;
+    }
+}
+
+//Procedures de recuperation et sauvegarde de blockchains
+void save_write(char* file_name_blockchain, Block* block)
+{
+	FILE* file;
+	file = fopen(file_name_blockchain, "a");
+	if (file!= NULL)
+	{
+        int author;
+        sscanf(block->info->author,"%d", &author); //on convertit author en entier
+		fprintf(file, "%d %d %d %s %d %d %d %d\n", block->info->index, author, block->info->timestamp, (*block->info).name_house, block->info->posx, block->info->posy, block->info->hash, block->previous_hash);
+        ChargerMap_level("level/level_prop.txt", block->info->name_house, block->info->house_info);
+	}
+	fclose(file);
+}
+
+Blockchain* get_save(char* file_name_blockchain, int player)
+{
+    Blockchain* new_chain = (Blockchain*)malloc(sizeof(Blockchain));
+    new_chain = init_blockchain(player);
+    FILE* file;
+    file = fopen(file_name_blockchain, "r");
+    Block* block = (Block*)malloc(sizeof(Block));
+    block->info = (Info*)malloc(sizeof(Info));
+    while (fscanf(file, "%d %hhd %d %s %d %d %d %d\n",&block->info->index, block->info->author, &block->info->timestamp, (*block->info).name_house, &block->info->posx, &block->info->posy, &block->info->hash, &block->previous_hash) == 6)
+    {
+        new_chain->size ++;
+        block->previous_hash = new_chain->head->info->hash;
+        new_chain->head = block;
+        ChargerMap_level("level/level_prop.txt", block->info->name_house, block->info->house_info);
+    }
+	fclose(file);
+    
+    //il faut ajouter la nouvelle chaine a Chains !!!!!!!!!!!!!
+    return new_chain;
+}
+
+void make_block(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players, int* nb_house, Sprite* perso, Map* map,int sauv,Block *block){
+    if (sauv == 0)
+	{
+		int x, y, taille_x;
+    x = perso->xscroll;
+    y = perso->yscroll;
+    printf("Mettez une dimenssion de la maison carree en blocs : ");
+    scanf("%d", &taille_x);
+
+    new_house(x, y, taille_x, taille_x);
+
+    char* nom_fichier_map = (char*)malloc(11*sizeof(char)+2*sizeof(int));
+    snprintf(nom_fichier_map,11*sizeof(char)+2*sizeof(int),"level/%d_%d.txt",x,y);
+    
+
+    ChargerMap_level("level/level_prop.txt", nom_fichier_map, map);
+
+    block->info = (Info*)malloc(sizeof(Info));
+	block->info->index = (*nb_house) + 1;
+	block->info->author = player;
+	block->info->timestamp = (int) time(NULL);
+	block->info->name_house = nom_fichier_map;
+    block->info->house_info = map;
+	block->info->posx = x;
+	block->info->posy = y;
+    calc_new_hash(block);
+    block->suivant = NULL;
+    block->previous_hash = Chains[0]->courant->info->hash;
+
+	}
+	
+	else {
+	stock(file_name_blockchain, block, Chains, Players, nb_house);
+	}
+}
+
+Block* find_block(Blockchain* chain, int x, int y)
+{
+    Block* block = (Block*)malloc(sizeof(Block));
+    block->info = (Info*)malloc(sizeof(Info));
+    block = chain->head;
+	printf("okey");
+    while (1)
+    {
+        block = block->suivant;
+        if (block->info->posx == x && block->info->posy == y)
+        {
+            return block;
+        }
+        else if (block == chain->courant)
+        {
+            return NULL;
+        }
+    }
+}
+
+void new_player(char* file_name_blockchain, Arena* Players, Blockchain* Chains[9])
+{
+    Players->list[Players->nb_players] = Players->nb_players;
+    Chains[Players->nb_players] = Chains[0];
+    Players->nb_players ++;
 }
