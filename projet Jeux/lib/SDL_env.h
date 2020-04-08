@@ -51,7 +51,7 @@ typedef struct
     char* author;
     int timestamp;
     char* name_house;
-    Map* house_info;
+    Map house_info;
     int posx, posy;
     int hash;
 } Info;
@@ -90,7 +90,7 @@ void FreeMap(Map* map);
 void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_Surface* screen,int largeurscreen,int hauteurscreen);
 
 int world(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite* perso,Map monde,Map maison);
-void in_house(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map map,Block *block);
+void in_house(SDL_Surface* screen,SDL_Event event,Sprite *perso,Map map,Block *block);
 void game();
 void affichersprite(SDL_Surface* screen,Sprite *sprite);
 
@@ -106,6 +106,6 @@ int proof_of_work(Block* block, Blockchain* Chains[9], Arena* Players);
 //Procedures de recuperation et sauvegarde de la blockchain
 void save_write(char* file_name_blockchain, Block* block);
 Blockchain* get_save(char* file_name_blockchain, int player);
-void make_block(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players, Sprite* perso, Map* map,int sauv,Block *block);
+Block* make_block(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players, Sprite* perso, Map* map,int sauv,Block *block);
 Block* find_block(Blockchain* chain, int x, int y);
 void new_player(char* file_name_blockchain, Arena* Players, Blockchain* Chains[9]);
