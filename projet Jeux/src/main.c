@@ -24,6 +24,7 @@ int main(int argc, char* args[])
     Players->list[0] = 0;
     Players->list[1] = 1;
     Players->list[2] = 2;
+
     //get_save(save_name,0);
 	init_SDL();
     int *nb_house;
@@ -54,7 +55,7 @@ int main(int argc, char* args[])
         if (quit_game == 2){
             
             ChargerMap_level("level/level_prop.txt","level/level.txt",W);
-            world(save_name,"0",Chains,Players,"level/level_prop.txt","level/level.txt",screen,event,perso,(*W),maison);
+            world(save_name, &Players->list[0], Chains, Players, "level/level_prop.txt", "level/level.txt", screen, event, perso, (*W), maison);
             }
         quit = 1;
     }	
