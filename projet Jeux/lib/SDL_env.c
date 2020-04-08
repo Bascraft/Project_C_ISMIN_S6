@@ -778,7 +778,7 @@ Block* make_block(char* file_name_blockchain, char* player, Blockchain* Chains[9
 		int x, y, taille_x;
 		x = perso->xscroll;
 		y = perso->yscroll;
-		printf("Mettez une dimenssion de la maison carree en blocs : ");
+		printf("Mettez une dimenssion de la maison carree en blocs (au moins 20) : ");
 		scanf("%d", &taille_x);
 
 		new_house(x, y, taille_x, taille_x);
