@@ -270,18 +270,19 @@ void Afficher(SDL_Surface* screen,Map map,Sprite *sprite)
 	//printf("minx = %d;miny = %d;maxx = %d;maxy = %d\n",minx,miny,maxx,maxy);
 	for(i=minx;i<maxx;i++)//y
 	{   
-        //printf("ligne : %s\n",map.tab_map[i]);
+        printf("ligne : %s\n",map.tab_map[i]);
 		for(j=miny;j<maxy;j++)//x
 		{
 			Rect_dest.x = (i-minx)*map.LARGEUR_TILE;// - sprite->xscroll;
 			Rect_dest.y = (j-miny)*map.HAUTEUR_TILE ;//- sprite->yscroll;
-            //printf("%c\n",map.tab_map[i][j]);
-            //printf("map : %d\n",map.tab_map[i][j]-'0');
+            printf("%c\n",map.tab_map[i][j]);
+            printf("map : %d\n",map.tab_map[i][j]-'0');
 			/*Rect_source.x = (map.tab_map[j][i]-'0')*map.LARGEUR_TILE;
 			Rect_source.y = 0;*/
 
             //printf("source : %d\n",Rect_source.x);
 			//SDL_BlitSurface(tileset,&Rect_source,screen,&Rect_dest);
+			printf("test tab_map : %d\n", map.tab_map[j][i]);
             numblock = map.tab_map[j][i]-'0';
 			//printf("destx = %d;desty = %d\n",Rect_dest.x ,Rect_dest.y);
 			//printf("%d",numblock);
@@ -541,12 +542,13 @@ int world(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena
 			//snprintf(nom_fichier_level,11*sizeof(char)+2*sizeof(int),"level/%d_%d.txt",x,y);
 			Block *block;
 			block = find_block(Chains[0],x_monde,y_monde);
-			printf("i got herre\n");
+			Map map;
+			printf("i got here\n");
 			if (block == NULL){// quand il trouve pas 
-				make_block(file_name_blockchain,player,Chains,Players,perso,block->info->house_info,0,block);
+				make_block(file_name_blockchain, player, Chains, Players, perso, &map, 0, block);
 			}
 			printf("init_done");
-			in_house(file_name_blockchain,player,&Chains[9],Players,screen,event,perso,(*block->info->house_info),block);
+			in_house(file_name_blockchain, player, &Chains[9], Players, screen, event, perso, map, block);
 		}
 		SDL_Flip(screen);
 	}
@@ -562,7 +564,7 @@ void in_house(char* file_name_blockchain, char* player, Blockchain* Chains[9], A
         affichersprite(screen,perso);
 		SDL_Flip(screen);
 	}
-	make_block(file_name_blockchain,player,Chains,Players,perso,block->info->house_info,1,block);
+	make_block(file_name_blockchain,player,Chains,Players,perso,&house,1,block);
 }
 
 
@@ -770,17 +772,24 @@ void make_block(char* file_name_blockchain, char* player, Blockchain* Chains[9],
 		printf("%d\n",chain->size);
 		Info* info = (Info*)malloc(sizeof(Info));
         info->index = Chains[0]->size + 1;
+		printf("a\n");
         info->author = player;
         info->timestamp = (int) time(NULL);
         info->name_house = nom_fichier_map;
         info->house_info = map;
+        printf("b\n");
         info->posx = x;
         info->posy = y;
+        printf("c\n");
   		block->info = info;
+  		printf("test map : %d\n", block->info->house_info->LARGEUR_TILE);
+  		printf("d\n");
         calc_new_hash(block);
+        printf("e\n");
         block->suivant = NULL;
+        printf("f\n");
         block->previous_hash = Chains[0]->courant->info->hash;
-		printf("finished make_block"); 
+		printf("finished make_block\n"); 
 	}
 	
 	else {

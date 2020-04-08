@@ -89,7 +89,7 @@ void save_map(char* nom_fichier_level,Map* map);
 void FreeMap(Map* map);
 void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_Surface* screen,int largeurscreen,int hauteurscreen);
 
-int world(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde,Map maison);
+int world(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite* perso,Map monde,Map maison);
 void in_house(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map map,Block *block);
 void game();
 void affichersprite(SDL_Surface* screen,Sprite *sprite);
