@@ -680,9 +680,9 @@ int proof_of_work(Block* block, Blockchain* Chains[9], Arena* Players)      //On
 	fscanf(f_house, "%d %d", &x_size, &y_size);
     int house_size;
 	house_size = x_size * y_size;
-    if (house_size < 25)
+    if (house_size < 400)
         {
-            printf("Une habitation doit faire plus de 25m2 pour être valide.\n");
+            printf("Une habitation doit faire plus de 20 blocs de cote pour etre valide.\n");
             return 0; //On suppose qu'une maison doit avoir une taille minimum de 25m2
         }
     //Si la maison est valide on verifie quelle est bien coherente avec toute les chaines du reseau
