@@ -89,8 +89,8 @@ void save_map(char* nom_fichier_level,Map* map);
 void FreeMap(Map* map);
 void main_Menu(MainMenu *menu,SDL_Event event,int* quit_menu,int* quit_game,SDL_Surface* screen,int largeurscreen,int hauteurscreen);
 
-int world(int nb_house,char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde,Map maison);
-void in_house(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,int* nb_house,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map map,Block *block);
+int world(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,char* nom_fichier_prop,char* nom_fichier_level,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map monde,Map maison);
+void in_house(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players,SDL_Surface* screen,SDL_Event event,Sprite *perso,Map map,Block *block);
 void game();
 void affichersprite(SDL_Surface* screen,Sprite *sprite);
 
@@ -100,12 +100,12 @@ void affichersprite(SDL_Surface* screen,Sprite *sprite);
 Blockchain* init_blockchain(int player);
 void calc_new_hash(Block* block);
 unsigned long hash_timestamp(int timestamp);
-void stock(char* file_name, Block* block, Blockchain* Chains[9], Arena* Players, int* nb_house);
+void stock(char* file_name, Block* block, Blockchain* Chains[9], Arena* Players);
 int proof_of_work(Block* block, Blockchain* Chains[9], Arena* Players);
 
 //Procedures de recuperation et sauvegarde de la blockchain
 void save_write(char* file_name_blockchain, Block* block);
 Blockchain* get_save(char* file_name_blockchain, int player);
-void make_block(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players, int* nb_house, Sprite* perso, Map* map,int sauv,Block *block);
+void make_block(char* file_name_blockchain, char* player, Blockchain* Chains[9], Arena* Players, Sprite* perso, Map* map,int sauv,Block *block);
 Block* find_block(Blockchain* chain, int x, int y);
 void new_player(char* file_name_blockchain, Arena* Players, Blockchain* Chains[9]);
